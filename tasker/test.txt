@@ -1,0 +1,48 @@
+func AddTask() {
+    newScanner := bufio.NewScanner(os.Stdin)
+
+    var taskID uint
+    fmt.Println("Enter task ID (it's the number for the task. Check the last task to assign a number.): ")
+    newScanner.Scan()
+    _, err := fmt.Scan(newScanner.Text(), &taskID)
+    if err != nil {
+        log.Printf("Error: %v\n", err)
+        return
+    }
+
+    var description string
+    fmt.Println("Enter task description: ")
+    newScanner.Scan()
+    _, err = fmt.Scan(newScanner.Text(), &description)
+    if err != nil {
+        log.Printf("Error: %v\n", err)
+        return
+    }
+
+    var startTime int64
+    fmt.Println("Enter start time in format YY-MM-DD HH:MM:SS: ")
+    newScanner.Scan()
+    inputTime := newScanner.Text()
+    parsedTime, err := time.Parse("06-01-02 15:04:05", inputTime)
+    if err != nil {
+        log.Printf("Error parsing time: %v\n", err)
+        return
+    }
+    startTime = parsedTime.Unix()
+
+    var completionTime int64
+    fmt.Println("Enter time of completion in format YY-MM-DD HH:MM:SS: ")
+    newScanner.Scan()
+    inputTime = newScanner.Text()
+    parsedTime, err = time.Parse("06-01-02 15:04:05", inputTime)
+    if err != nil {
+        log.Printf("Error parsing time: %v\n", err)
+        return
+    }
+    completionTime = parsedTime.Unix()
+
+    task := NewTask(taskID, description, false, startTime, completionTime)
+    fmt.Println("Task added:")
+    fmt.Println(task)
+    // Consider adding the task to your task list or database here.
+}
