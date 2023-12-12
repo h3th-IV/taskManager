@@ -99,9 +99,8 @@ func TaskManagerApp() {
 		case 4:
 			//Remove Task
 			for {
-				fmt.Print("enter R or r to remove task, or any other key to exit: ")
-				fmt.Scanf("%s", &continum)
-				if continum == "R" || continum == "r" {
+				continum = Remover()
+				if continum != "R" && continum != "r" {
 					goto start
 				}
 			}
