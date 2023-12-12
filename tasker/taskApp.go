@@ -10,28 +10,24 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// 09020440447
-// macbobbychibuzor@gmail.com
-func printMenu() {
-	fmt.Println("\nTask List CLI")
-	fmt.Println("||Select an option for Tasks||\n ----------------------------")
-	fmt.Println(" [1]\t||   Create Task")
-	fmt.Println(" [2]\t||   List Task")
-	fmt.Println(" [3]\t||   Mark-Completed")
-	fmt.Println(" [4]\t||   Remove-Task")
-	fmt.Println(" [5]\t||   Exit")
-}
-
 func TaskManagerApp() {
 	var (
-		newUser  bool
-		userName string
-		option   int
-		continum string
-		UserList = &TaskManager{}
+		user           string
+		pass           string
+		userNameNExist string
+		passwordNExist string
+		newUser        string
+		userNameExist  string
+		passwordExist  string
+		continum       string
 	)
 	usrName := "^[a-zA-Z0-9]{5,10}$"
 	userCheker, err := regexp.Compile(usrName)
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
+	userSecret := "^[a-zA-Z0-9!@#$%?/\\<>.,;:]{8,15}"
+	passChecker, err := regexp.Compile(userSecret)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
@@ -45,50 +41,58 @@ func TaskManagerApp() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	defer database.CloseDB()
 
-	fmt.Println("Do you have an account")
-	fmt.Print("Enter Your Username(Username must be at least 5 characters): ")
-	fmt.Scanf("%s", &userName)
-	if userCheker.MatchString(userName) {
+	fmt.Println("Do you have an account(Y/N): ")
+	fmt.Scanf("%s", newUser)
+	if newUser == "Y" || newUser == "y" {
+		fmt.Println("Username(must be alphanumeric, 5-10 characters	): ")
+		fmt.Scanf("%s", &user)
+		fmt.Println("Password(must be at least 8 characters): ")
+		fmt.Scanf("%s", &pass)
+		//try to match username and password, if it matches specification
+		if userCheker.MatchString(user) && passChecker.MatchString(pass) {
+			userNameNExist = user
+			passwordNExist = pass
+			database.CreateUser(userNameNExist, passwordNExist)
+			database.CreateTaskTable()
+		}
+	}
+	fmt.Print("Username: ")
+	fmt.Scanf("%s", &userNameExist)
+	fmt.Print("Password: ")
+	fmt.Scanf("%s", &passwordExist)
+	auth, err := database.SelectDetails(userNameExist)
+	if err != nil {
+		log.Fatalf("Unable to retrieve user deatils: %v", err)
+	}
+	if passwordExist == auth {
 		// task := NewTask()
-		fmt.Printf("Hello, %s\n", userName)
+		fmt.Printf("Hello, %s\n", userNameExist)
 	start:
-		printMenu()
-		fmt.Print("select an option: ")
-		fmt.Scanf("%d", &option)
+		option := printMenu()
 		switch option {
 		case 1:
 			//Create Task
 			for {
-				fmt.Print("enter A or a to add task, or any other key to exit: ")
-				fmt.Scanf("%s", &continum)
-				if continum == "A" || continum == "a" {
-					UserList.CreateTask()
-				} else {
+				continum = handleTaskAddition()
+				if continum != "A" && continum != "a" {
 					goto start
 				}
 			}
 		case 2:
 			// List Task
 			for {
-				fmt.Print("enter L or l to List task, or any other key to exit: ")
-				fmt.Scanf("%s", &continum)
-				if continum == "L" || continum == "l" {
-					UserList.ListTask()
-				} else {
+				continum = Lister()
+				if continum != "L" && continum != "l" {
 					goto start
 				}
 			}
 		case 3:
 			//Mark Completed
 			for {
-				fmt.Print("enter M or m to mark task as completed, or any other key to exit: ")
-				fmt.Scanf("%s", &continum)
-				if continum == "M" || continum == "m" {
-					UserList.MarkComplete()
-				} else {
+				continum = Marka()
+				if continum != "M" && continum != "m" {
 					goto start
 				}
 			}
@@ -98,8 +102,6 @@ func TaskManagerApp() {
 				fmt.Print("enter R or r to remove task, or any other key to exit: ")
 				fmt.Scanf("%s", &continum)
 				if continum == "R" || continum == "r" {
-					UserList.RemoveTask()
-				} else {
 					goto start
 				}
 			}

@@ -1,5 +1,12 @@
 package database
 
+import (
+	"fmt"
+	"log"
+	"time"
+)
+
+// tables won't be created everytime
 func CreateUserTable() error {
 	query := `CREATE TABLE IF NOT EXISTS users (
 		user_id SERIAL PRIMARY KEY,
@@ -13,6 +20,8 @@ func CreateUserTable() error {
 	}
 	return nil
 }
+
+// actually tables won't be created everytime so won't be used
 func CreateTaskTable() error {
 	query := `CREATE TABLE IF NOT EXISTS tasks (
 		task_id SERIAL PRIMARY KEY,
@@ -30,10 +39,50 @@ func CreateTaskTable() error {
 	return nil
 }
 
+// Creates User and Update the database
 func CreateUser(username, password string) error {
 	query := `INSERT INTO users (username, password_hash)
 	VALUES ($1, $2, $3);`
 	_, err := dB.Exec(query, username, password)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// some kind of login mechanism
+func SelectDetails(username string) (string, error) {
+	query := `SELECT password_hash FROM users where username = $1`
+	var password string
+	err := dB.QueryRow(query, username).Scan(&password)
+	if err != nil {
+		return "", err
+	}
+	return password, nil
+}
+
+var (
+	testPassword string
+	Username     string
+)
+
+func test() {
+	testPassword = "mytestPassword"
+	Pass, err := SelectDetails(Username)
+	if err != nil {
+		log.Println(err)
+	}
+	if testPassword == Pass {
+		fmt.Println("Login succesful")
+	} else {
+		fmt.Println("Anthentication error")
+	}
+}
+
+func InsertTask(description, status string, startAt, dueAt, completedAt time.Time) error {
+	query := `INSERT INTO tasks (description, status, start_time, due_date, completion_time)
+	VALUES ($1, $2,$3, $4, $5)`
+	_, err := dB.Exec(query, description, status, startAt, dueAt, completedAt)
 	if err != nil {
 		return err
 	}
