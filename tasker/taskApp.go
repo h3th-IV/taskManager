@@ -24,6 +24,7 @@ func printMenu() {
 
 func TaskManagerApp() {
 	var (
+		newUser  bool
 		userName string
 		option   int
 		continum string
@@ -46,6 +47,8 @@ func TaskManagerApp() {
 	}
 
 	defer database.CloseDB()
+
+	fmt.Println("Do you have an account")
 	fmt.Print("Enter Your Username(Username must be at least 5 characters): ")
 	fmt.Scanf("%s", &userName)
 	if userCheker.MatchString(userName) {
