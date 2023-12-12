@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"time"
+
+	"github.com/h3th-IV/taskManager/database"
 )
 
 type InitTask struct {
