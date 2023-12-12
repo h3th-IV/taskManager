@@ -3,35 +3,29 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 )
 
-type Database struct {
-	DB *sql.DB
-}
+var (
+	dB *sql.DB
+)
 
-func NewDB() *Database {
+func InitDB() error {
 	dataSrcName := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s", os.Getenv("PG_HOST"), os.Getenv("PG_PORT"), os.Getenv("PG_USER"), os.Getenv("PG_PASSWORD"), os.Getenv("PG_DBNAME"))
 
 	db, err := sql.Open("postgres", dataSrcName)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	fmt.Println("Connection to Database was succesfull")
-
-	return &Database{
-		DB: db,
-	}
+	return nil
 }
 
-func InitDB() {
-	dataBase := NewDB()
-	defer dataBase.DB.Close()
-
+func CloseDB() {
+	dB.Close()
 }

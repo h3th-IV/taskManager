@@ -5,6 +5,9 @@ import (
 	"log"
 	"regexp"
 	"time"
+
+	"github.com/h3th-IV/taskManager/database"
+	"github.com/joho/godotenv"
 )
 
 // 09020440447
@@ -31,6 +34,18 @@ func TaskManagerApp() {
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
+	//load envrons
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatalf("error loading env variables: %v", err)
+	}
+
+	err = database.InitDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer database.CloseDB()
 	fmt.Print("Enter Your Username(Username must be at least 5 characters): ")
 	fmt.Scanf("%s", &userName)
 	if userCheker.MatchString(userName) {
