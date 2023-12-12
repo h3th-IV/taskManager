@@ -9,13 +9,24 @@ func CreateUserTable() error {
 	query := `CREATE TABLE IF NOT EXISTS users (
 		user_id SERIAL PRIMARY KEY,
 		username VARCHAR(50) NOT NULL,
-		password_hash VARCHAR(100) NOT NULL, --todo hash password omooooo :)
+		password_hash VARCHAR(100) NOT NULL,
 	);`
 	_, err := dB.Exec(query)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+// retreive userId
+func GetUserById(username string) (int, error) {
+	query := `"SELECT user_id FROM users WHERE username = $1";`
+	var userID int
+	err := dB.QueryRow(query, username).Scan(&userID)
+	if err != nil {
+		return 0, err
+	}
+	return userID, nil
 }
 
 // Creates User and Update the database
@@ -31,7 +42,7 @@ func CreateUser(username, password string) error {
 
 // some kinda login mechanism
 func SelectDetails(username string) (string, error) {
-	query := `SELECT password_hash FROM users where username = $1`
+	query := `SELECT password_hash FROM users where username = $1;`
 	var password string
 	err := dB.QueryRow(query, username).Scan(&password)
 	if err != nil {
@@ -62,7 +73,7 @@ func CreateTaskTable() error {
 // insert task with user_id
 func InsertTask(user_id, description, status string, startAt, dueAt time.Time) error {
 	query := `INSERT INTO tasks (user_id, description, status, start_time, due_date, completion_time)
-	VALUES ($1, $2,$3, $4, $5, $6)`
+	VALUES ($1, $2,$3, $4, $5, $6);`
 	_, err := dB.Exec(query, user_id, description, status, startAt, dueAt)
 	if err != nil {
 		return err
@@ -72,7 +83,7 @@ func InsertTask(user_id, description, status string, startAt, dueAt time.Time) e
 
 func MarkTask(status string, completedAt time.Time) error {
 	query := `INSERT INTO tasks (status, completion_time)
-	VALUES ($1, $2)`
+	VALUES ($1, $2);`
 	_, err := dB.Exec(query, status, completedAt)
 	if err != nil {
 		return err
