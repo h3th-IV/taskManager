@@ -60,10 +60,10 @@ func CreateTaskTable() error {
 }
 
 // insert task with user_id
-func InsertTask(description, status string, startAt, dueAt time.Time) error {
+func InsertTask(user_id, description, status string, startAt, dueAt time.Time) error {
 	query := `INSERT INTO tasks (user_id, description, status, start_time, due_date, completion_time)
-	VALUES ($1, $2,$3, $4, $5)`
-	_, err := dB.Exec(query, description, status, startAt, dueAt)
+	VALUES ($1, $2,$3, $4, $5, $6)`
+	_, err := dB.Exec(query, user_id, description, status, startAt, dueAt)
 	if err != nil {
 		return err
 	}
