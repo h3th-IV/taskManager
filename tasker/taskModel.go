@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"time"
+
+	"github.com/h3th-IV/taskManager/database"
 )
 
 type InitTask struct {
@@ -96,6 +98,7 @@ func (tm *TaskManager) CreateTask() {
 		status: "Uncomplete",
 	}
 	tm.TaskList = append(tm.TaskList, tersk)
+	database.InsertTask(tersk.Description, tersk.status, tersk.StartTime, tersk.DueDate)
 	fmt.Println("Task Created Succesfully")
 }
 

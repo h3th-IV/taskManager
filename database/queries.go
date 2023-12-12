@@ -1,8 +1,6 @@
 package database
 
 import (
-	"fmt"
-	"log"
 	"time"
 )
 
@@ -61,28 +59,20 @@ func SelectDetails(username string) (string, error) {
 	return password, nil
 }
 
-var (
-	testPassword string
-	Username     string
-)
-
-func test() {
-	testPassword = "mytestPassword"
-	Pass, err := SelectDetails(Username)
-	if err != nil {
-		log.Println(err)
-	}
-	if testPassword == Pass {
-		fmt.Println("Login succesful")
-	} else {
-		fmt.Println("Anthentication error")
-	}
-}
-
-func InsertTask(description, status string, startAt, dueAt, completedAt time.Time) error {
+func InsertTask(description, status string, startAt, dueAt time.Time) error {
 	query := `INSERT INTO tasks (description, status, start_time, due_date, completion_time)
 	VALUES ($1, $2,$3, $4, $5)`
-	_, err := dB.Exec(query, description, status, startAt, dueAt, completedAt)
+	_, err := dB.Exec(query, description, status, startAt, dueAt)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarkTask(status string, completedAt time.Time) error {
+	query := `INSERT INTO tasks (status, completion_time)
+	VALUES ($1, $2)`
+	_, err := dB.Exec(query, status, completedAt)
 	if err != nil {
 		return err
 	}
