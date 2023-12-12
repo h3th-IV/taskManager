@@ -10,7 +10,6 @@ func CreateUserTable() error {
 		user_id SERIAL PRIMARY KEY,
 		username VARCHAR(50) NOT NULL,
 		password_hash VARCHAR(100) NOT NULL, --todo hash password omooooo :)
-		-- Add other user-related fields as needed
 	);`
 	_, err := dB.Exec(query)
 	if err != nil {
