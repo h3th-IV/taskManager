@@ -53,6 +53,7 @@ func TaskManagerApp() {
 		return
 	}
 	if newUser == "N" || newUser == "n" {
+		fmt.Print("|\t\t\t\tREGISTER  \t\t\t\t\t|\n")
 		fmt.Print("Username(must be alphanumeric, 5-10 characters	): ")
 		_, err := fmt.Scanf("%s", &user)
 		if err != nil {
@@ -74,6 +75,7 @@ func TaskManagerApp() {
 		}
 	}
 	//if user alredy registered, login
+	fmt.Print("|\t\t\t\t\tLOGIN  \t\t\t\t\t\t|\n")
 	fmt.Print("Enter your username: ")
 	_, err = fmt.Scanf("%s", &userNameExist)
 	if err != nil {
