@@ -53,13 +53,13 @@ func TaskManagerApp() {
 		return
 	}
 	if newUser == "N" || newUser == "n" {
-		fmt.Println("Username(must be alphanumeric, 5-10 characters	): ")
+		fmt.Print("Username(must be alphanumeric, 5-10 characters	): ")
 		_, err := fmt.Scanf("%s", &user)
 		if err != nil {
 			log.Println("Error readding username: ", err)
 			return
 		}
-		fmt.Println("Password(must be at least 8 characters): ")
+		fmt.Print("Password(must be at least 8 characters): ")
 		_, err = fmt.Scanf("%s", &pass)
 		if err != nil {
 			log.Println("Error reading password: ", err)
