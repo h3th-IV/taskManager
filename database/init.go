@@ -16,7 +16,7 @@ func InitDB() error {
 		os.Getenv("PG_HOST"), os.Getenv("PG_PORT"), os.Getenv("PG_USER"),
 		os.Getenv("PG_PASSWORD"), os.Getenv("PG_DBNAME"))
 
-	log.Printf("Data Source Name: %s", dataSrcName) //dBugging
+	// log.Printf("Data Source Name: %s", dataSrcName) //dBugging
 
 	var err error
 	DB, err = sql.Open("postgres", dataSrcName)
