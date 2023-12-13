@@ -43,13 +43,25 @@ func TaskManagerApp() {
 	}
 	defer database.CloseDB()
 
-	fmt.Println("Do you have an account(Y/N): ")
-	fmt.Scanf("%s", newUser)
+	fmt.Print("Do you have an account(Y/N): ")
+	_, err = fmt.Scanf("%s", &newUser)
+	if err != nil {
+		log.Println("Error reading user response:", err)
+		return
+	}
 	if newUser == "Y" || newUser == "y" {
 		fmt.Println("Username(must be alphanumeric, 5-10 characters	): ")
-		fmt.Scanf("%s", &user)
+		_, err := fmt.Scanf("%s", &user)
+		if err != nil {
+			log.Println("Error readding username: ", err)
+			return
+		}
 		fmt.Println("Password(must be at least 8 characters): ")
-		fmt.Scanf("%s", &pass)
+		_, err = fmt.Scanf("%s", &pass)
+		if err != nil {
+			log.Println("Error reading password: ", err)
+			return
+		}
 		//try to match username and password, if it matches specification
 		if userCheker.MatchString(user) && passChecker.MatchString(pass) {
 			userNameNExist = user
@@ -58,14 +70,25 @@ func TaskManagerApp() {
 			database.CreateTaskTable()
 		}
 	}
-	fmt.Print("Username: ")
-	fmt.Scanf("%s", &userNameExist)
-	fmt.Print("Password: ")
-	fmt.Scanf("%s", &passwordExist)
+	fmt.Print("Enter your username: ")
+	_, err = fmt.Scanf("%s", &userNameExist)
+	if err != nil {
+		log.Println("Error reading username: ")
+		return
+	}
+
+	fmt.Print("Enter password: ")
+	_, err = fmt.Scanf("%s", &passwordExist)
+	if err != nil {
+		log.Println("Error Reading password: ", err)
+		return
+	}
+
 	auth, err := database.SelectDetails(userNameExist)
 	if err != nil {
 		log.Fatalf("Unable to retrieve user deatils: %v", err)
 	}
+
 	if passwordExist == auth {
 		// task := NewTask()
 		fmt.Printf("Hello, %s\n", userNameExist)

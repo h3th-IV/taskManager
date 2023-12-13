@@ -3,29 +3,29 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
+
+	_ "github.com/lib/pq"
 )
 
-var (
-	dB *sql.DB
-)
+var DB *sql.DB
 
 func InitDB() error {
-	dataSrcName := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s", os.Getenv("PG_HOST"), os.Getenv("PG_PORT"), os.Getenv("PG_USER"), os.Getenv("PG_PASSWORD"), os.Getenv("PG_DBNAME"))
+	dataSrcName := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("PG_HOST"), os.Getenv("PG_PORT"), os.Getenv("PG_USER"),
+		os.Getenv("PG_PASSWORD"), os.Getenv("PG_DBNAME"))
 
-	db, err := sql.Open("postgres", dataSrcName)
-	if err != nil {
-		return err
-	}
+	log.Printf("Data Source Name: %s", dataSrcName) //dBugging
 
-	err = db.Ping()
+	var err error
+	DB, err = sql.Open("postgres", dataSrcName)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
-	fmt.Println("Connection to Database was succesfull")
-	return nil
+	return DB.Ping()
 }
 
 func CloseDB() {
-	dB.Close()
+	DB.Close()
 }

@@ -11,7 +11,18 @@ func CreateUserTable() error {
 		username VARCHAR(50) NOT NULL,
 		password_hash VARCHAR(100) NOT NULL
 	);`
-	_, err := dB.Exec(query)
+	_, err := DB.Exec(query)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Creates User and Update the database
+func CreateUser(username, password string) error {
+	query := `INSERT INTO users (username, password_hash)
+	VALUES ($1, $2);`
+	_, err := DB.Exec(query, username, password)
 	if err != nil {
 		return err
 	}
@@ -22,7 +33,7 @@ func CreateUserTable() error {
 func GetUserById(username string) (int, error) {
 	query := `SELECT user_id FROM users WHERE username = $1;`
 	var userID int
-	row := dB.QueryRow(query, username)
+	row := DB.QueryRow(query, username)
 	err := row.Scan(&userID)
 	if err != nil {
 		return 0, err
@@ -30,22 +41,11 @@ func GetUserById(username string) (int, error) {
 	return userID, nil
 }
 
-// Creates User and Update the database
-func CreateUser(username, password string) error {
-	query := `INSERT INTO users (username, password_hash)
-	VALUES ($1, $2);`
-	_, err := dB.Exec(query, username, password)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 // some kinda login mechanism
 func SelectDetails(username string) (string, error) {
 	query := `SELECT password_hash FROM users where username = $1;`
 	var password string
-	row := dB.QueryRow(query, username)
+	row := DB.QueryRow(query, username)
 	err := row.Scan(&password)
 	if err != nil {
 		return "", err
@@ -65,7 +65,7 @@ func CreateTaskTable() error {
         due_date TIMESTAMP NOT NULL,
         completion_time TIMESTAMP
     );`
-	_, err := dB.Exec(query)
+	_, err := DB.Exec(query)
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func CreateTaskTable() error {
 func InsertTask(description, status string, startAt, dueAt time.Time) error {
 	query := `INSERT INTO tasks (description, status, start_time, due_date, completion_time)
 	VALUES ($1, $2,$3, $4, $5);`
-	_, err := dB.Exec(query, description, status, startAt, dueAt, nil)
+	_, err := DB.Exec(query, description, status, startAt, dueAt, nil)
 	if err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func InsertTask(description, status string, startAt, dueAt time.Time) error {
 func MarkTask(status string, completedAt time.Time) error {
 	query := `INSERT INTO tasks (status, completion_time)
 	VALUES ($1, $2);`
-	_, err := dB.Exec(query, status, completedAt)
+	_, err := DB.Exec(query, status, completedAt)
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func MarkTask(status string, completedAt time.Time) error {
 
 func DeleteTask(task_ID int) error {
 	query := `DELETE FROM tasks WHERE task_id = $1;`
-	_, err := dB.Exec(query, task_ID)
+	_, err := DB.Exec(query, task_ID)
 	if err != nil {
 		return err
 	}
