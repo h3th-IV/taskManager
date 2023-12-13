@@ -21,11 +21,13 @@ func TaskManagerApp() {
 		passwordExist  string
 		continum       string
 	)
+	//constraints for username
 	usrName := "^[a-zA-Z0-9]{5,10}$"
 	userCheker, err := regexp.Compile(usrName)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
+	//constraints for password
 	userSecret := "^[a-zA-Z0-9!@#$%?/\\<>.,;:]{8,15}"
 	passChecker, err := regexp.Compile(userSecret)
 	if err != nil {
@@ -37,6 +39,7 @@ func TaskManagerApp() {
 		log.Fatalf("error loading env variables: %v", err)
 	}
 
+	//initialize dB
 	err = database.InitDB()
 	if err != nil {
 		log.Fatal(err)
@@ -49,7 +52,7 @@ func TaskManagerApp() {
 		log.Println("Error reading user response:", err)
 		return
 	}
-	if newUser == "Y" || newUser == "y" {
+	if newUser == "N" || newUser == "n" {
 		fmt.Println("Username(must be alphanumeric, 5-10 characters	): ")
 		_, err := fmt.Scanf("%s", &user)
 		if err != nil {
@@ -62,14 +65,16 @@ func TaskManagerApp() {
 			log.Println("Error reading password: ", err)
 			return
 		}
-		//try to match username and password, if it matches specification
+		//try to match username and password, if it matches constraints
 		if userCheker.MatchString(user) && passChecker.MatchString(pass) {
 			userNameNExist = user
 			passwordNExist = pass
+			//Register user to dB
 			database.CreateUser(userNameNExist, passwordNExist)
 			database.CreateTaskTable()
 		}
 	}
+	//if user alredy registered, login
 	fmt.Print("Enter your username: ")
 	_, err = fmt.Scanf("%s", &userNameExist)
 	if err != nil {

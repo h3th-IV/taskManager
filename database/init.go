@@ -9,8 +9,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var DB *sql.DB
+var dB *sql.DB
 
+// initialize dB and try connecting to it
 func InitDB() error {
 	dataSrcName := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("PG_HOST"), os.Getenv("PG_PORT"), os.Getenv("PG_USER"),
@@ -19,13 +20,15 @@ func InitDB() error {
 	// log.Printf("Data Source Name: %s", dataSrcName) //dBugging
 
 	var err error
-	DB, err = sql.Open("postgres", dataSrcName)
+	dB, err = sql.Open("postgres", dataSrcName)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return DB.Ping()
+	return dB.Ping()
 }
 
 func CloseDB() {
-	DB.Close()
+	dB.Close()
 }
+
+//todo -- push with sslmode enabled
