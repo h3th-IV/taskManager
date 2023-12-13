@@ -71,7 +71,6 @@ func TaskManagerApp() {
 			passwordNExist = pass
 			//Register user to dB
 			database.CreateUser(userNameNExist, passwordNExist)
-			database.CreateTaskTable()
 		}
 	}
 	//if user alredy registered, login
