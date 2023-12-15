@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"time"
 )
@@ -96,7 +95,7 @@ func InsertTask(user string, description, status string, startAt, dueAt time.Tim
 }
 
 // list task with user_id
-func GetTaskList(usrname string) {
+func GetTaskList(usrname string) *sql.Rows {
 	user_ID, err := GetUserById(usrname)
 	if err != nil {
 		log.Fatal(err)
@@ -106,25 +105,10 @@ func GetTaskList(usrname string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer tasks.Close()
-	fmt.Println("\t--------Your Task---------")
-	for tasks.Next() {
-		var task_ID int
-		var Description string
-		var status string
-		var start_time time.Time
-		var due_date time.Time
-		var completedAt sql.NullTime
-
-		if err := tasks.Scan(&task_ID, &Description, &status, &status, &start_time, &due_date, &completedAt); err != nil {
-			log.Fatal(err)
-			return
-		}
-		fmt.Printf("TaskID: %d\nDescription: %s\nDue by: %s\nStatus: %s\n+---------------------------------------+\n", task_ID, Description, due_date, status)
-	}
 	if err := tasks.Err(); err != nil {
 		log.Fatal(err)
 	}
+	return tasks
 }
 
 // mark task as completed with ....

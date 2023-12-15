@@ -3,6 +3,7 @@ package tasker
 // []TODO use slice operation to remove task from task list
 import (
 	"bufio"
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
@@ -116,7 +117,27 @@ func parseTime(input string) (time.Time, error) {
 
 func (tm *TaskManager) ListTask() {
 	username := authDetails.Username
-	database.GetTaskList(username)
+	taskRow := database.GetTaskList(username)
+	fmt.Print("\n\n")
+	if len(tm.TaskList) == 0 {
+		fmt.Println("You have no task Right now. Rest Up")
+	}
+	fmt.Println("\t--------Your Task---------")
+	fmt.Println("+---------------------------------------+")
+	for taskRow.Next() {
+		var task_ID int
+		var Description string
+		var status string
+		var start_time time.Time
+		var due_date time.Time
+		var completedAt sql.NullTime
+
+		if err := taskRow.Scan(&task_ID, &Description, &status, &start_time, &due_date, &completedAt); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("TaskID: %d\nDescription: %s\nDue by: %s\nStatus: %s\n+---------------------------------------+\n", task_ID, Description, due_date, status)
+	}
+
 }
 
 func (tm *TaskManager) MarkComplete() {
