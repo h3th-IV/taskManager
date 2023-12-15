@@ -13,8 +13,6 @@ import (
 )
 
 type InitTask struct {
-	Marker      string
-	TaskID      uint
 	Description string
 	StartTime   time.Time
 	DueDate     time.Time
@@ -33,22 +31,6 @@ type TaskManager struct {
 func NewTask() *CompletedTask {
 
 	newScanner := bufio.NewScanner(os.Stdin)
-	// var ID uint
-	// fmt.Println("+------------------------------------------------+")
-	// fmt.Print("Enter the Task ID,(check last Task get new TaskID): ")
-	// newScanner.Scan()
-	// input := newScanner.Text()
-	// _, err := fmt.Sscan(input, &ID)
-	// if err != nil {
-	// 	log.Printf("%v\n", err)
-	// }
-
-	// // if newScanner.Scan() {
-	// // 	ID := newScanner.Text()
-	// // 	fmt.Printf("Task ID: %s\n", ID)
-	// // } else {
-	// // 	fmt.Println("Error reading input:", newScanner.Err())
-	// // }
 	var description string
 	fmt.Println("+----------------------+")
 	fmt.Println("New Task description: ")
@@ -102,7 +84,7 @@ func (tm *TaskManager) CreateTask() {
 	tersk := NewTask()
 	tm.TaskList = append(tm.TaskList, *tersk)
 	database.InsertTask(userName, tersk.Description, tersk.status, tersk.StartTime, tersk.DueDate)
-	fmt.Println("Task Created Succesfully")
+	fmt.Println("Task Created Succesfully.")
 }
 
 func parseTime(input string) (time.Time, error) {
@@ -148,7 +130,7 @@ func (tm *TaskManager) ListTask() string {
 		}
 
 	} else {
-		fmt.Print("you have no tasks\n\n")
+		fmt.Print("You have no tasks.\n\n")
 		return "false"
 	}
 	return "true"
@@ -170,8 +152,9 @@ func (tm *TaskManager) MarkComplete() {
 			return
 		}
 		database.MarkTask(int(ID))
+		fmt.Println("Task marked as completed.")
 	} else {
-		fmt.Println("No task to mark as complete")
+		fmt.Println("No task to mark as complete.")
 	}
 }
 
@@ -190,6 +173,7 @@ func (tm *TaskManager) RemoveTask() {
 			fmt.Printf("error: unable to get TaskID")
 		}
 		database.DeleteTask(int(ID))
+		fmt.Println("Task Removed Succesfully.")
 	}
 
 }

@@ -54,7 +54,7 @@ func Register() {
 		log.Fatal(err)
 	}
 
-	fmt.Print("Do you have an account(press N to register, press anykey to Login): ")
+	fmt.Print("Do you have an account(press N to register, press any key to Login): ")
 	_, err = fmt.Scanf("%s", &newUser)
 	if err != nil {
 		log.Println("Error reading user response:", err)
