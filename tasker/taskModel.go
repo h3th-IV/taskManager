@@ -115,7 +115,7 @@ func parseTime(input string) (time.Time, error) {
 	return parsedTime, nil
 }
 
-func (tm *TaskManager) ListTask() bool {
+func (tm *TaskManager) ListTask() string {
 	username := authDetails.Username
 	//get tasks for user with user_Id
 	taskRow := database.GetTaskList(username)
@@ -123,40 +123,40 @@ func (tm *TaskManager) ListTask() bool {
 	fmt.Println("\t--------Your Task---------")
 	fmt.Println("+---------------------------------------+")
 	//iterate through the rows returned
-	for taskRow.Next() {
-		var task_ID int
-		var user_ID int
-		var Description string
-		var status string
-		var start_time time.Time
-		var due_date time.Time
-		var completedAt sql.NullTime
-
-		//coollect input from that task row instance retured
-		if err := taskRow.Scan(&task_ID, &user_ID, &Description, &status, &start_time, &due_date, &completedAt); err != nil {
-			log.Fatal(err)
-		}
-		if status == "Uncomplete" {
-			fmt.Printf("[ ]TaskID: %d\nDescription: %s\nDue by: %s\nStatus: %s\n+---------------------------------------+\n", task_ID, Description, due_date, status)
-		} else {
-			fmt.Printf("[X]TaskID: %d\nDescription: %s\nDue by: %s\nStatus: %s\n+---------------------------------------+\n", task_ID, Description, due_date, status)
-		}
-	}
-
-	if err := taskRow.Err(); err != nil {
-		log.Fatal(err)
-	}
 	if taskRow.Next() {
-		return true
+		for {
+			var task_ID int
+			var user_ID int
+			var Description string
+			var status string
+			var start_time time.Time
+			var due_date time.Time
+			var completedAt sql.NullTime
+
+			//coollect input from that task row instance retured
+			if err := taskRow.Scan(&task_ID, &user_ID, &Description, &status, &start_time, &due_date, &completedAt); err != nil {
+				log.Fatal(err)
+			}
+			if status == "Uncomplete" {
+				fmt.Printf("[ ]TaskID: %d\nDescription: %s\nDue by: %s\nStatus: %s\n+---------------------------------------+\n", task_ID, Description, due_date, status)
+			} else {
+				fmt.Printf("[X]TaskID: %d\nDescription: %s\nDue by: %s\nStatus: %s\n+---------------------------------------+\n", task_ID, Description, due_date, status)
+			}
+			if !taskRow.Next() {
+				break
+			}
+		}
+
 	} else {
-		fmt.Printf("You have no task Right now. Rest Up\n\n")
-		return false
+		fmt.Print("you have no tasks\n\n")
+		return "false"
 	}
+	return "true"
 }
 
 func (tm *TaskManager) MarkComplete() {
 	checker := tm.ListTask()
-	if checker {
+	if checker == "true" {
 		newScanner := bufio.NewScanner(os.Stdin)
 
 		var ID uint
@@ -167,14 +167,17 @@ func (tm *TaskManager) MarkComplete() {
 		if err != nil {
 			log.Printf("%v\n", err)
 			fmt.Printf("error: unable to get TaskID")
+			return
 		}
 		database.MarkTask(int(ID))
+	} else {
+		fmt.Println("No task to mark as complete")
 	}
 }
 
 func (tm *TaskManager) RemoveTask() {
 	checker := tm.ListTask()
-	if checker {
+	if checker == "true" {
 		newScanner := bufio.NewScanner(os.Stdin)
 
 		var ID uint
