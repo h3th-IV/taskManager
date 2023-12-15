@@ -174,6 +174,8 @@ func (tm *TaskManager) RemoveTask() {
 		}
 		database.DeleteTask(int(ID))
 		fmt.Println("Task Removed Succesfully.")
+	} else {
+		fmt.Println("No Task to Remove.")
 	}
 
 }
