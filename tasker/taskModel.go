@@ -50,7 +50,7 @@ func NewTask() *CompletedTask {
 	// // }
 	var description string
 	fmt.Println("+----------------------+")
-	fmt.Println("Task description: ")
+	fmt.Println("New Task description: ")
 	if newScanner.Scan() {
 		description = newScanner.Text()
 	} else {
@@ -87,8 +87,6 @@ func NewTask() *CompletedTask {
 
 	tersk := CompletedTask{
 		InitTask: InitTask{
-			Marker:      "[ ]",
-			TaskID:      ID,
 			Description: description,
 			StartTime:   parsedStartAt,
 			DueDate:     parsedDuedate,
@@ -118,15 +116,6 @@ func parseTime(input string) (time.Time, error) {
 
 func (tm *TaskManager) ListTask() {
 	username := authDetails.Username
-	fmt.Print("\n\n")
-	if len(tm.TaskList) == 0 {
-		fmt.Println("You have no task Right now. Rest Up")
-	}
-	fmt.Println("\t--------Your Task---------")
-	fmt.Println("+---------------------------------------+")
-	for _, tersk := range tm.TaskList {
-		fmt.Printf("%sTaskID: %d\nDescription: %s\nDue by: %s\nStatus: %s\n+---------------------------------------+\n", tersk.Marker, tersk.TaskID, tersk.Description, tersk.StartTime, tersk.status)
-	}
 	database.GetTaskList(username)
 }
 

@@ -128,10 +128,11 @@ func GetTaskList(usrname string) {
 }
 
 // mark task as completed with ....
-func MarkTask(status string, completedAt time.Time) error {
-	query := `INSERT INTO tasks (status, completion_time)
-	VALUES ($1, $2);`
-	_, err := dB.Exec(query, status, completedAt)
+func MarkTask(completedAt time.Time) error {
+	query := `UPDATE tasks
+	SET status = $1, completion_time = $2
+	WHERE task_id = $3;`
+	_, err := dB.Exec(query, "Completed", time.Now())
 	if err != nil {
 		return err
 	}
