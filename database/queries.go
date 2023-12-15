@@ -112,17 +112,18 @@ func GetTaskList(usrname string) *sql.Rows {
 }
 
 // mark task as completed with ....
-func MarkTask(completedAt time.Time) error {
+func MarkTask(task_ID int) error {
 	query := `UPDATE tasks
 	SET status = $1, completion_time = $2
 	WHERE task_id = $3;`
-	_, err := dB.Exec(query, "Completed", time.Now())
+	_, err := dB.Exec(query, "Completed", time.Now(), task_ID)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
+// remove task with id
 func DeleteTask(task_ID int) error {
 	query := `DELETE FROM tasks WHERE task_id = $1;`
 	_, err := dB.Exec(query, task_ID)

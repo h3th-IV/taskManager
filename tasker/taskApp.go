@@ -17,13 +17,10 @@ func TaskManagerApp() {
 	var (
 		continum string
 	)
-	Login()
+	Register()
 	auth := authDetails.Auth
 	if passwordExist == auth {
-		// task := NewTask()
 		fmt.Printf("Hello, %s\n", userNameExist)
-		// user_ID, _ := database.GetUserById(userNameExist)
-		// fmt.Println(user_ID)
 	start:
 		option := printMenu()
 		switch option {

@@ -8,3 +8,4 @@
 - [X] List Task
 
 - [X] Remove Task
+- Realease v2.0 stores task, users in database 

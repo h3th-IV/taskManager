@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// authentiction details
 type AuthDetails struct {
 	Auth     string
 	Username string
@@ -20,15 +21,15 @@ var (
 	option   int
 	UserList = &TaskManager{}
 )
+var (
+	user           string
+	pass           string
+	userNameNExist string
+	passwordNExist string
+	newUser        string
+)
 
-func Login() {
-	var (
-		user           string
-		pass           string
-		userNameNExist string
-		passwordNExist string
-		newUser        string
-	)
+func Register() {
 	//constraints for username
 	usrName := "^[a-zA-Z0-9]{5,10}$"
 	userCheker, err := regexp.Compile(usrName)
@@ -53,14 +54,14 @@ func Login() {
 		log.Fatal(err)
 	}
 
-	fmt.Print("Do you have an account(Y/N): ")
+	fmt.Print("Do you have an account(press N to register, press anykey to Login): ")
 	_, err = fmt.Scanf("%s", &newUser)
 	if err != nil {
 		log.Println("Error reading user response:", err)
 		return
 	}
 	if newUser == "N" || newUser == "n" {
-		fmt.Print("|\t\t\t\tREGISTER  \t\t\t\t\t|\n")
+		fmt.Print("\t\t\t\tREGISTER  \t\t\t\t\t\n")
 		fmt.Print("Username(must be alphanumeric, 5-10 characters	): ")
 		_, err := fmt.Scanf("%s", &user)
 		if err != nil {
@@ -82,7 +83,7 @@ func Login() {
 		}
 	}
 	//if user alredy registered, login
-	fmt.Print("|\t\t\t\t\tLOGIN  \t\t\t\t\t\t|\n")
+	fmt.Print("\t\t\t\t\tLOGIN  \t\t\t\t\t\t\n")
 	fmt.Print("Enter your username: ")
 	_, err = fmt.Scanf("%s", &userNameExist)
 	if err != nil {
@@ -104,7 +105,6 @@ func Login() {
 	}
 	authDetails.Auth = auth
 	authDetails.Username = userNameExist
-
 }
 
 func printMenu() int {

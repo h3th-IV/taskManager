@@ -33,15 +33,15 @@ type TaskManager struct {
 func NewTask() *CompletedTask {
 
 	newScanner := bufio.NewScanner(os.Stdin)
-	var ID uint
-	fmt.Println("+------------------------------------------------+")
-	fmt.Print("Enter the Task ID,(check last Task get new TaskID): ")
-	newScanner.Scan()
-	input := newScanner.Text()
-	_, err := fmt.Sscan(input, &ID)
-	if err != nil {
-		log.Printf("%v\n", err)
-	}
+	// var ID uint
+	// fmt.Println("+------------------------------------------------+")
+	// fmt.Print("Enter the Task ID,(check last Task get new TaskID): ")
+	// newScanner.Scan()
+	// input := newScanner.Text()
+	// _, err := fmt.Sscan(input, &ID)
+	// if err != nil {
+	// 	log.Printf("%v\n", err)
+	// }
 
 	// // if newScanner.Scan() {
 	// // 	ID := newScanner.Text()
@@ -115,73 +115,78 @@ func parseTime(input string) (time.Time, error) {
 	return parsedTime, nil
 }
 
-func (tm *TaskManager) ListTask() {
+func (tm *TaskManager) ListTask() bool {
 	username := authDetails.Username
+	//get tasks for user with user_Id
 	taskRow := database.GetTaskList(username)
 	fmt.Print("\n\n")
-	if len(tm.TaskList) == 0 {
-		fmt.Println("You have no task Right now. Rest Up")
-	}
 	fmt.Println("\t--------Your Task---------")
 	fmt.Println("+---------------------------------------+")
+	//iterate through the rows returned
 	for taskRow.Next() {
 		var task_ID int
+		var user_ID int
 		var Description string
 		var status string
 		var start_time time.Time
 		var due_date time.Time
 		var completedAt sql.NullTime
 
-		if err := taskRow.Scan(&task_ID, &Description, &status, &start_time, &due_date, &completedAt); err != nil {
+		//coollect input from that task row instance retured
+		if err := taskRow.Scan(&task_ID, &user_ID, &Description, &status, &start_time, &due_date, &completedAt); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("TaskID: %d\nDescription: %s\nDue by: %s\nStatus: %s\n+---------------------------------------+\n", task_ID, Description, due_date, status)
+		if status == "Uncomplete" {
+			fmt.Printf("[ ]TaskID: %d\nDescription: %s\nDue by: %s\nStatus: %s\n+---------------------------------------+\n", task_ID, Description, due_date, status)
+		} else {
+			fmt.Printf("[X]TaskID: %d\nDescription: %s\nDue by: %s\nStatus: %s\n+---------------------------------------+\n", task_ID, Description, due_date, status)
+		}
 	}
 
+	if err := taskRow.Err(); err != nil {
+		log.Fatal(err)
+	}
+	if taskRow.Next() {
+		return true
+	} else {
+		fmt.Printf("You have no task Right now. Rest Up\n\n")
+		return false
+	}
 }
 
 func (tm *TaskManager) MarkComplete() {
-	newScanner := bufio.NewScanner(os.Stdin)
+	checker := tm.ListTask()
+	if checker {
+		newScanner := bufio.NewScanner(os.Stdin)
 
-	var ID uint
-	fmt.Print("Enter the Task ID, to be Marked complete: ")
-	newScanner.Scan()
-	input := newScanner.Text()
-	_, err := fmt.Sscan(input, &ID)
-	if err != nil {
-		log.Printf("%v\n", err)
-		fmt.Printf("error: unable to get TaskID")
-	}
-
-	for i, tersk := range tm.TaskList {
-		if tersk.InitTask.TaskID == ID {
-			tm.TaskList[i].Marker = "[X]"
-			tm.TaskList[i].status = "Completed"
-			tm.TaskList[i].CompletionTime = time.Now()
+		var ID uint
+		fmt.Print("Enter the Task ID, to be Marked complete: ")
+		newScanner.Scan()
+		input := newScanner.Text()
+		_, err := fmt.Sscan(input, &ID)
+		if err != nil {
+			log.Printf("%v\n", err)
+			fmt.Printf("error: unable to get TaskID")
 		}
+		database.MarkTask(int(ID))
 	}
-	fmt.Println("Task marked as completed! SCRAM")
 }
 
 func (tm *TaskManager) RemoveTask() {
-	newScanner := bufio.NewScanner(os.Stdin)
+	checker := tm.ListTask()
+	if checker {
+		newScanner := bufio.NewScanner(os.Stdin)
 
-	var ID uint
-	fmt.Print("Enter the Task ID, to be Removed: ")
-	newScanner.Scan()
-	input := newScanner.Text()
-	_, err := fmt.Sscan(input, &ID)
-	if err != nil {
-		log.Printf("%v\n", err)
-		fmt.Printf("error: unable to get TaskID")
-	}
-
-	for i, tersk := range tm.TaskList {
-		if tersk.InitTask.TaskID == ID {
-			//slicing
-			tm.TaskList = append(tm.TaskList[:i], tm.TaskList[i+1:]...)
-			fmt.Println("Task removed succesfully")
+		var ID uint
+		fmt.Print("Enter the Task ID, to be Removed: ")
+		newScanner.Scan()
+		input := newScanner.Text()
+		_, err := fmt.Sscan(input, &ID)
+		if err != nil {
+			log.Printf("%v\n", err)
+			fmt.Printf("error: unable to get TaskID")
 		}
+		database.DeleteTask(int(ID))
 	}
-	tm.ListTask()
+
 }
