@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"time"
+
+	"github.com/h3th-IV/taskManager/database"
 )
 
 type InitTask struct {
@@ -27,11 +29,9 @@ type TaskManager struct {
 	TaskList []CompletedTask
 }
 
-func (tm *TaskManager) CreateTask() {
+func NewTask() *CompletedTask {
+
 	newScanner := bufio.NewScanner(os.Stdin)
-
-	//logic for adding task to TaskList
-
 	var ID uint
 	fmt.Println("+------------------------------------------------+")
 	fmt.Print("Enter the Task ID,(check last Task get new TaskID): ")
@@ -95,11 +95,19 @@ func (tm *TaskManager) CreateTask() {
 		},
 		status: "Uncomplete",
 	}
-	tm.TaskList = append(tm.TaskList, tersk)
+	return &tersk
+}
+
+func (tm *TaskManager) CreateTask() {
+	userName := authDetails.Username
+	tersk := NewTask()
+	tm.TaskList = append(tm.TaskList, *tersk)
+	database.InsertTask(userName, tersk.Description, tersk.status, tersk.StartTime, tersk.DueDate)
 	fmt.Println("Task Created Succesfully")
 }
 
 func parseTime(input string) (time.Time, error) {
+	//time is collected as string then parsed as time.Time
 	layout := "06-01-02 15:04:05" // YY-MM-DD HH:MM:SS
 	parsedTime, err := time.Parse(layout, input)
 	if err != nil {
@@ -109,6 +117,7 @@ func parseTime(input string) (time.Time, error) {
 }
 
 func (tm *TaskManager) ListTask() {
+	username := authDetails.Username
 	fmt.Print("\n\n")
 	if len(tm.TaskList) == 0 {
 		fmt.Println("You have no task Right now. Rest Up")
@@ -118,6 +127,7 @@ func (tm *TaskManager) ListTask() {
 	for _, tersk := range tm.TaskList {
 		fmt.Printf("%sTaskID: %d\nDescription: %s\nDue by: %s\nStatus: %s\n+---------------------------------------+\n", tersk.Marker, tersk.TaskID, tersk.Description, tersk.StartTime, tersk.status)
 	}
+	database.GetTaskList(username)
 }
 
 func (tm *TaskManager) MarkComplete() {

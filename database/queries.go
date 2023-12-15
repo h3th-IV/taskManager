@@ -1,6 +1,9 @@
 package database
 
 import (
+	"database/sql"
+	"fmt"
+	"log"
 	"time"
 )
 
@@ -64,6 +67,7 @@ func CreateTaskTable() error {
         start_time TIMESTAMP NOT NULL,
         due_date TIMESTAMP NOT NULL,
         completion_time TIMESTAMP
+
     );`
 	_, err := dB.Exec(query)
 	if err != nil {
@@ -73,14 +77,54 @@ func CreateTaskTable() error {
 }
 
 // insert task with user_id
-func InsertTask(description, status string, startAt, dueAt time.Time) error {
-	query := `INSERT INTO tasks (description, status, start_time, due_date, completion_time)
-	VALUES ($1, $2,$3, $4, $5);`
-	_, err := dB.Exec(query, description, status, startAt, dueAt, nil)
+func InsertTask(user string, description, status string, startAt, dueAt time.Time) error {
+	query := `INSERT INTO tasks (user_id, description, status, start_time, due_date, completion_time)
+	VALUES ($1, $2,$3, $4, $5, $6);`
+	var (
+		err     error
+		user_iD int
+	)
+	user_iD, err = GetUserById(user)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = dB.Exec(query, user_iD, description, status, startAt, dueAt, nil)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+// list task with user_id
+func GetTaskList(usrname string) {
+	user_ID, err := GetUserById(usrname)
+	if err != nil {
+		log.Fatal(err)
+	}
+	query := `SELECT * FROM tasks WHERE user_id = $1;`
+	tasks, err := dB.Query(query, user_ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer tasks.Close()
+	fmt.Println("\t--------Your Task---------")
+	for tasks.Next() {
+		var task_ID int
+		var Description string
+		var status string
+		var start_time time.Time
+		var due_date time.Time
+		var completedAt sql.NullTime
+
+		if err := tasks.Scan(&task_ID, &Description, &status, &status, &start_time, &due_date, &completedAt); err != nil {
+			log.Fatal(err)
+			return
+		}
+		fmt.Printf("TaskID: %d\nDescription: %s\nDue by: %s\nStatus: %s\n+---------------------------------------+\n", task_ID, Description, due_date, status)
+	}
+	if err := tasks.Err(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 // mark task as completed with ....
