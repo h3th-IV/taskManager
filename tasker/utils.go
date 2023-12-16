@@ -22,11 +22,11 @@ var (
 	UserList = &TaskManager{}
 )
 var (
-	user           string
-	pass           string
-	userNameNExist string
-	passwordNExist string
-	newUser        string
+	user             string
+	pass             string
+	userNameNExist   string
+	passwordNExist   string
+	checkIfUserExist rune
 )
 
 func Register() {
@@ -54,13 +54,14 @@ func Register() {
 		log.Fatal(err)
 	}
 
-	fmt.Print("Do you have an account(press N to register, press any key to Login): ")
-	_, err = fmt.Scanf("%s", &newUser)
+	fmt.Print("Do you have an account(y/n): ")
+	_, err = fmt.Scanf("%c", &checkIfUserExist)
 	if err != nil {
 		log.Println("Error reading user response:", err)
 		return
 	}
-	if newUser == "N" || newUser == "n" {
+	fmt.Scanln()
+	if checkIfUserExist == 'n' {
 		fmt.Print("\t\t\t\tREGISTER  \t\t\t\t\t\n")
 		fmt.Print("Username(must be alphanumeric, 5-10 characters	): ")
 		_, err := fmt.Scanf("%s", &user)
@@ -80,7 +81,15 @@ func Register() {
 			passwordNExist = pass
 			//Register user to dB
 			database.CreateUser(userNameNExist, passwordNExist)
+		} else {
+			log.Println("Invalid Username or password charctrers")
+			return
 		}
+	}
+	invalidNewuser := checkIfUserExist >= 'a' && checkIfUserExist <= 'z' && checkIfUserExist != 'y'
+	if invalidNewuser {
+		log.Println("Unrecognized input. Please enter 'N' or 'Y' to login.")
+		return
 	}
 	//if user alredy registered, login
 	fmt.Print("\t\t\t\t\tLOGIN  \t\t\t\t\t\t\n")
@@ -97,10 +106,9 @@ func Register() {
 		log.Println("Error Reading password: ", err)
 		return
 	}
-
 	auth, err := database.SelectDetails(userNameExist)
 	if err != nil {
-		log.Fatalf("Unable to retrieve user deatils: %v", err)
+		log.Fatal("Unable to retrieve user deatils")
 		return
 	}
 	authDetails.Auth = auth
