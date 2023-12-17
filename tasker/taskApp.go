@@ -60,7 +60,7 @@ func TaskManagerApp() {
 		case 5:
 			//SCRAM
 			fmt.Println("Exiting the program...")
-			time.Sleep(3 * time.Second)
+			time.Sleep(2 * time.Second)
 			return
 		default:
 			fmt.Println("Invalid choice")

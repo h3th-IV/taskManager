@@ -87,16 +87,6 @@ func (tm *TaskManager) CreateTask() {
 	fmt.Println("Task Created Succesfully.")
 }
 
-func parseTime(input string) (time.Time, error) {
-	//time is collected as string then parsed as time.Time
-	layout := "06-01-02 15:04:05" // YY-MM-DD HH:MM:SS
-	parsedTime, err := time.Parse(layout, input)
-	if err != nil {
-		return time.Time{}, err
-	}
-	return parsedTime, nil
-}
-
 func (tm *TaskManager) ListTask() string {
 	username := authDetails.Username
 	//get tasks for user with user_Id

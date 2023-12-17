@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"time"
 
 	"github.com/h3th-IV/taskManager/database"
 	"github.com/joho/godotenv"
@@ -54,7 +55,7 @@ func Register() {
 		log.Fatal(err)
 	}
 
-	fmt.Print("Do you have an account(y/n): ")
+	fmt.Print("Do you have an account(y/n)->  ")
 	_, err = fmt.Scanf("%c", &checkIfUserExist)
 	if err != nil {
 		log.Println("Error reading user response:", err)
@@ -63,13 +64,13 @@ func Register() {
 	fmt.Scanln()
 	if checkIfUserExist == 'n' {
 		fmt.Print("\t\t\t\tREGISTER  \t\t\t\t\t\n")
-		fmt.Print("Username(must be alphanumeric, 5-10 characters	): ")
+		fmt.Print("Username(must be alphanumeric, 5-10 characters	)-> ")
 		_, err := fmt.Scanf("%s", &user)
 		if err != nil {
 			log.Println("Error readding username: ", err)
 			return
 		}
-		fmt.Print("Password(must be at least 8 characters): ")
+		fmt.Print("Password(must be at least 8 characters)->  ")
 		_, err = fmt.Scanf("%s", &pass)
 		if err != nil {
 			log.Println("Error reading password: ", err)
@@ -86,9 +87,10 @@ func Register() {
 			return
 		}
 	}
-	invalidNewuser := checkIfUserExist >= 'a' && checkIfUserExist <= 'z' && checkIfUserExist != 'y'
+	invalidNewuser := checkIfUserExist >= 'a' && checkIfUserExist <= 'z' && checkIfUserExist != 'y' && checkIfUserExist != 'n'
 	if invalidNewuser {
-		log.Println("Unrecognized input. Please enter 'N' or 'Y' to login.")
+		log.Println("Unrecognized input. Please enter 'N' or 'Y' to login. Exiting...")
+		time.Sleep(2 * time.Second)
 		return
 	}
 	//if user alredy registered, login
@@ -106,17 +108,28 @@ func Register() {
 		log.Println("Error Reading password: ", err)
 		return
 	}
+	fmt.Println("Logging in...")
+	time.Sleep(2 * time.Second)
 	auth, err := database.SelectDetails(userNameExist)
 	if err != nil {
-		log.Fatal("Unable to retrieve user deatils")
+		log.Fatal("Unable to retrieve user deatils: Incorrect user details")
 		return
 	}
 	authDetails.Auth = auth
 	authDetails.Username = userNameExist
 }
 
+func parseTime(input string) (time.Time, error) {
+	//time is collected as string then parsed as time.Time
+	layout := "06-01-02 15:04:05" // YY-MM-DD HH:MM:SS
+	parsedTime, err := time.Parse(layout, input)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return parsedTime, nil
+}
 func printMenu() int {
-	fmt.Println("\nTask List CLI")
+	fmt.Println("\nTask Manager CLI")
 	fmt.Println("||Select an option for Tasks||\n ----------------------------")
 	fmt.Println(" [1]\t||   Create Task")
 	fmt.Println(" [2]\t||   List Task")
